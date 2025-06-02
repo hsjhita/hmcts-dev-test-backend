@@ -67,7 +67,7 @@ tasks.withType(JavaExec).configureEach {
   javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
   useJUnitPlatform()
 
   testLogging {
@@ -79,14 +79,14 @@ test {
   failFast = true
 }
 
-task functional(type: Test) {
+tasks.register('functional', Test) {
   description = "Runs functional tests"
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
-task integration(type: Test) {
+tasks.register('integration', Test) {
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -94,7 +94,7 @@ task integration(type: Test) {
   failFast = true
 }
 
-task smoke(type: Test) {
+tasks.register('smoke', Test) {
   description = "Runs Smoke Tests"
   testClassesDirs = sourceSets.smokeTest.output.classesDirs
   classpath = sourceSets.smokeTest.runtimeClasspath
@@ -155,7 +155,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.8'
-
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.postgresql:postgresql'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
@@ -167,6 +168,9 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok'
   annotationProcessor 'org.projectlombok:lombok'
 
+  testImplementation 'org.springframework.security:spring-security-test'
+  testImplementation 'org.testcontainers:junit-jupiter:1.19.8'
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.6'
   testImplementation(platform('org.junit:junit-bom:5.12.2'))
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
@@ -187,6 +191,10 @@ bootJar {
 
 // Gradle 7.x issue, workaround from: https://github.com/gradle/gradle/issues/17236#issuecomment-894768083
 rootProject.tasks.named("processSmokeTestResources") {
+  duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named("processIntegrationTestResources") {
   duplicatesStrategy = 'include'
 }
 

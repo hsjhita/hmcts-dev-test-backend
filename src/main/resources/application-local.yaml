@@ -1,0 +1,6 @@
+# Local development configuration for a Spring Boot application using PostgreSQL
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:6432}/${DB_NAME:cases}${DB_OPTIONS:}
+    username: ${DB_USER_NAME:postgres}
+    password: ${DB_PASSWORD:postgres}
